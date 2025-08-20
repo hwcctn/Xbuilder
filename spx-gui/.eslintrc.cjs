@@ -41,8 +41,7 @@ module.exports = {
             // Workaround for https://github.com/vuejs/eslint-plugin-vue/issues/2437
             name: 'vue',
             importNames: ['defineProps', 'defineEmits'],
-            message:
-              '`defineProps` and `defineEmits` are compiler macros and no longer need to be imported.'
+            message: '`defineProps` and `defineEmits` are compiler macros and no longer need to be imported.'
           }
         ]
       }
@@ -54,6 +53,6 @@ module.exports = {
         destructuredArrayIgnorePattern: '^_'
       }
     ],
-    'vue/one-component-per-file': 'off',
+    'vue/one-component-per-file': 'off'
   }
 }

@@ -172,7 +172,7 @@ const handleNewProject = useMessageHandle(
   gap: var(--ui-gap-middle);
   
   @include responsive(mobile) {
-    gap: 16px;
+    gap: 8px;
   }
 }
 
