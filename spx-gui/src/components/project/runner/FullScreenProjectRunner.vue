@@ -5,6 +5,8 @@ import { useMessageHandle } from '@/utils/exception'
 import { Project } from '@/models/project'
 import { UIButton, UIModalClose } from '@/components/ui'
 import ProjectRunner from '@/components/project/runner/ProjectRunner.vue'
+import MobileKeyboard from '@/components/project/runner/mobile/MobileKeyboard.vue'
+import { useResponsive } from '@/components/ui'
 import { useLastClickEvent } from '@/utils/dom'
 
 const props = defineProps<{
@@ -56,6 +58,8 @@ const handleRerun = useMessageHandle(() => projectRunnerRef.value?.rerun(), {
   en: 'Failed to rerun project',
   zh: '重新运行项目失败'
 })
+
+const isMobile = useResponsive('mobile')
 </script>
 
 <template>
@@ -97,7 +101,12 @@ const handleRerun = useMessageHandle(() => projectRunnerRef.value?.rerun(), {
         </div>
       </div>
       <div class="main">
-        <ProjectRunner ref="projectRunnerRef" class="runner" :project="project" />
+        <MobileKeyboard v-if="isMobile">
+          <template #gameView>
+            <ProjectRunner ref="projectRunnerRef" class="runner" :project="project" />
+          </template>
+        </MobileKeyboard>
+        <ProjectRunner v-else ref="projectRunnerRef" class="runner" :project="project" />
       </div>
     </div>
   </div>

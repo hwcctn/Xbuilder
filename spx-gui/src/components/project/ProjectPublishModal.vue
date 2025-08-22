@@ -9,7 +9,10 @@ import { saveFile } from '@/models/common/cloud'
 import type { Project } from '@/models/project'
 import { UIImg, UIFormModal, UIForm, UIFormItem, UITextInput, UIButton, useForm } from '@/components/ui'
 import { stringifyProjectFullName } from '@/apis/project'
-
+import { useModal } from '@/components/ui'
+import { ref } from 'vue'
+import KeyboardEditorModal from '@/components/project/keyboard-mobile/KeyboardEditorModal.vue'
+type KeyboardLayoutConfig = { zones: Record<string, string | null> }
 const props = defineProps<{
   project: Project
   visible: boolean
@@ -79,6 +82,14 @@ const handleSubmit = useMessageHandle(
   },
   { en: 'Failed to publish project', zh: '项目发布失败' }
 )
+// mobile
+const openKeyboardEditor = useModal(KeyboardEditorModal)
+const keyboardMode = ref<'none' | 'custom'>('none')
+const keyboardConfig = ref<KeyboardLayoutConfig | null>(null)
+async function handleEditKeyboard() {
+  const result = await openKeyboardEditor({ initial: keyboardConfig.value })
+  keyboardConfig.value = result // 用户点击“确定”时由编辑器返回
+}
 </script>
 
 <template>
@@ -108,6 +119,49 @@ const handleSubmit = useMessageHandle(
           type="textarea"
           :placeholder="$t({ en: 'What is new in this release?', zh: '这次发布有什么新内容？' })"
         />
+      </UIFormItem>
+      <!-- mobile -->
+      <UIFormItem :label="$t({ en: 'Mobile keyboard', zh: '移动端键盘' })">
+        <div class="kb-cards">
+          <div
+            class="kb-card"
+            :class="{ active: keyboardMode === 'none' }"
+            @click="keyboardMode = 'none'"
+          >
+            <div class="kb-card-title">{{ $t({ en: 'Disabled', zh: '不启用' }) }}</div>
+            <div class="kb-card-desc">
+              {{
+                $t({
+                  en: 'Do not show on-screen keyboard on mobile.',
+                  zh: '在移动端不显示屏幕按键。'
+                })
+              }}
+            </div>
+          </div>
+          <div
+            class="kb-card"
+            :class="{ active: keyboardMode === 'custom' }"
+            @click="keyboardMode = 'custom'"
+          >
+            <div class="kb-card-title">{{ $t({ en: 'Custom keyboard', zh: '自定义键盘' }) }}</div>
+            <div class="kb-card-desc">
+              {{
+                $t({
+                  en: 'Design your own on-screen buttons for mobile.',
+                  zh: '为移动端自定义屏幕按键布局。'
+                })
+              }}
+            </div>
+            <div v-if="keyboardMode === 'custom'" class="kb-actions">
+              <UIButton size="small" type="primary" @click.stop="handleEditKeyboard">
+                {{ $t({ en: 'Edit keyboard', zh: '编辑键盘' }) }}
+              </UIButton>
+              <span v-if="keyboardConfig != null" class="kb-hint">
+                {{ $t({ en: 'Configured', zh: '已配置' }) }}
+              </span>
+            </div>
+          </div>
+        </div>
       </UIFormItem>
       <UIFormItem :label="$t({ en: 'Project description', zh: '项目描述' })" path="projectDescription">
         <UITextInput
@@ -180,4 +234,35 @@ const handleSubmit = useMessageHandle(
   gap: 12px;
   margin-top: 20px;
 }
+// mobile
+.kb-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.kb-card {
+  border: 1px solid var(--ui-color-dividing-line-2);
+  border-radius: var(--ui-border-radius-1);
+  padding: 12px;
+  cursor: pointer;
+  background: var(--ui-color-grey-100);
+}
+.kb-card.active {
+  border-color: var(--ui-color-primary-main);
+  box-shadow: 0 0 0 2px rgba(11, 192, 207, 0.15);
+}
+.kb-card-title {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.kb-card-desc {
+  color: var(--ui-color-grey-800);
+}
+.kb-actions {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.kb-hint { color: var(--ui-color-grey-800); }
 </style>

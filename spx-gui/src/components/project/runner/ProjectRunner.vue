@@ -4,7 +4,6 @@ import { useSpxVersion } from '@/utils/utils'
 import type { Project } from '@/models/project'
 import ProjectRunnerV1 from './v1/ProjectRunnerV1.vue'
 import ProjectRunnerV2 from './v2/ProjectRunnerV2.vue'
-
 const props = defineProps<{ project: Project }>()
 
 const emit = defineEmits<{
@@ -18,7 +17,6 @@ function handleConsole(type: 'log' | 'warn', args: unknown[]) {
 }
 
 const version = useSpxVersion()
-
 defineExpose({
   async run(signal?: AbortSignal) {
     return projectRunnerRef.value?.run(signal)
