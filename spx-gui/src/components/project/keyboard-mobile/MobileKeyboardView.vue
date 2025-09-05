@@ -33,6 +33,13 @@ onMounted(() => {
     <div class="phone-1YZxt">
         <slot name="gameView" class="game-view"></slot>
         <div class="stage-vTZqo">
+            <div class="sys sysA">
+                <slot name="sysA"></slot>
+            </div>
+            <div class="sys sysB">
+                <slot name="sysB"></slot>
+            </div>
+
             <!-- 左上角-->
             <div class="zone lt">
                 <UIKeyBtn v-if="zoneToKey.lt" :value="zoneToKey.lt!" :active="true" />
@@ -91,6 +98,20 @@ onMounted(() => {
     position: absolute;
     inset: 0;
     z-index: 2;
+
+    .sys {
+        position: absolute;
+        top: 2%;
+
+    }
+
+    .sysA {
+        left: 2%;
+    }
+
+    .sysB {
+        right: 10%;
+    }
 
     .zone {
         position: absolute;

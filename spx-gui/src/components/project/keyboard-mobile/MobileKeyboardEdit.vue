@@ -11,6 +11,19 @@
                     <div class="phone-1YZxt">
                         <img :src="phone" alt="phone" style="transform: rotate(180deg)" />
                         <div class="stage-vTZqo" :class="{ dragging: !!drag }">
+                            <!-- 系统键 2 个 -->
+                            <div class="zone sysA">
+                                <UIButton
+                                    v-radar="{ name: 'Rerun button', desc: 'Click to rerun the project in full screen' }"
+                                    icon="rotate">
+                                    {{ $t({ en: 'Rerun', zh: '重新运行' }) }}
+                                </UIButton>
+
+                            </div>
+                            <div class="zone sysB">
+                                <UIModalClose
+                                    v-radar="{ name: 'Close full screen', desc: 'Click to close full screen project runner' }" />
+                            </div>
                             <!-- 左上角 1 个 -->
                             <div class="zone lt" :ref="el => (zoneRefs.lt.value = el as HTMLElement)"
                                 :class="{ over: hoverZone === 'lt' }">
@@ -108,6 +121,7 @@ const emit = defineEmits<ModalComponentEmits<KeyboardLayoutConfig>>()
 
 const { t } = useI18n()
 import UIKeyBtn from './ui/UIKeyBtn.vue';
+import { UIModalClose } from '@/components/ui'
 import phone from '@/assets/images/mobile.png';
 import { reactive, ref } from 'vue'
 const pool = ref<string[]>([
@@ -248,6 +262,18 @@ function confirm() { emit('resolved', zoneToKey) }
         transition: box-shadow .15s, border-color .15s;
     }
 
+    .sysA {
+        left: 5%;
+        top: 5%;
+
+    }
+
+    .sysB {
+        right: 5%;
+        top: 5%;
+
+    }
+
     &.dragging .zone {
         border-color: var(--color-primary);
     }
@@ -258,14 +284,14 @@ function confirm() { emit('resolved', zoneToKey) }
 
     .lt {
         left: 6%;
-        top: 8%;
+        top: 20%;
         width: 10%;
         height: 14%;
     }
 
     .rt {
         right: 6%;
-        top: 8%;
+        top: 20%;
         width: 10%;
         height: 14%;
     }

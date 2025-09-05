@@ -90,6 +90,17 @@ const isMobile = useResponsive('mobile')
           <template #gameView>
             <ProjectRunner ref="projectRunnerRef" class="runner" :project="project" />
           </template>
+          <template #sysA>
+            <UIButton v-radar="{ name: 'Rerun button', desc: 'Click to rerun the project in full screen' }"
+              class="button" icon="rotate" :disabled="initialLoading" :loading="handleRerun.isLoading.value"
+              @click="handleRerun.fn">
+              {{ $t({ en: 'Rerun', zh: '重新运行' }) }}
+            </UIButton>
+          </template>
+          <template #sysB>
+            <UIModalClose v-radar="{ name: 'Close full screen', desc: 'Click to close full screen project runner' }"
+              class="close" @click="emit('close')" />
+          </template>
         </MobileKeyboardView>
         <ProjectRunner v-else ref="projectRunnerRef" class="runner" :project="project" />
       </div>
@@ -155,6 +166,10 @@ const isMobile = useResponsive('mobile')
   height: 56px;
   color: var(--ui-color-title);
 
+  @include responsive(mobile) {
+    display: none;
+  }
+
 }
 
 .header-left {
@@ -181,9 +196,9 @@ const isMobile = useResponsive('mobile')
   align-items: center;
   padding-right: 20px;
 
-  @include responsive(mobile) {
-    margin-right: 100px;
-  }
+  // @include responsive(mobile) {
+  //   margin-right: 100px;
+  // }
 
 
 }

@@ -8,7 +8,8 @@
 declare const self: DedicatedWorkerGlobalScope
 
 import '@/assets/wasm/wasm_exec.js'
-import spxlsWasmUrl from '@/assets/wasm/spxls.wasm?url'
+// import spxlsWasmUrl from '@/assets/wasm/spxls.wasm?url'
+import spxlsWasmUrl from '@/assets/wasm/ispx.wasm?url'
 import spxlsPkgdataZipUrl from '@/assets/wasm/spxls-pkgdata.zip?url'
 import type { Files, Message, NotificationMessage, RequestMessage, ResponseMessage, Spxls } from './spxls'
 
