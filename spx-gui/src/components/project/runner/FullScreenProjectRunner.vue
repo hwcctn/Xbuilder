@@ -65,7 +65,16 @@ const systemKeys = computed(() => [
     icon: 'rotate' as IconType,
     loading: handleRerun.isLoading.value,
     disabled: initialLoading.value,
+    action: 'rerun',
   },
+  {
+    textEn: 'Close',
+    textZh: '关闭',
+    icon: 'close' as IconType,
+    loading: false,
+    disabled: false,
+    action: 'close',
+  }
 ])
 // const systemKeys = [
 //   {
@@ -76,6 +85,13 @@ const systemKeys = computed(() => [
 //     disabled: initialLoading.value,
 //   },
 // ]
+function handleSysBtn(action: string) {
+  if (action === 'rerun') {
+    handleRerun.fn()
+  } else if (action === 'close') {
+    emit('close')
+  }
+}
 </script>
 
 <template>
@@ -105,7 +121,7 @@ const systemKeys = computed(() => [
       </div>
       <div class="main">
         <MobileKeyboardView v-if="isMobile && project.mobileKeyboardType === 2"
-          :initial="project.mobileKeyboardZoneToKey || {}" :SystemKeyConfig="systemKeys" @handleSysA="handleRerun.fn">
+          :initial="project.mobileKeyboardZoneToKey || {}" :SystemKeyConfig="systemKeys" @handleSysBtn="handleSysBtn">
           <template #gameView>
             <ProjectRunner ref="projectRunnerRef" class="runner" :project="project" />
           </template>
