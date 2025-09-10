@@ -113,11 +113,11 @@
 import type { ModalComponentEmits, ModalComponentProps } from '@/components/ui/modal/UIModalProvider.vue'
 import { UIFullScreenModal, UIButton } from '../../ui'
 import { useI18n } from '@/utils/i18n'
-type KeyboardLayoutConfig = Record<string, string | null>
+type MobileKeyboardZoneToKeyMapping = Record<string, string | null>
 
 
-const props = defineProps<ModalComponentProps & { initial?: KeyboardLayoutConfig | null }>()
-const emit = defineEmits<ModalComponentEmits<KeyboardLayoutConfig>>()
+const props = defineProps<ModalComponentProps & { zoneToKeyMapping?: MobileKeyboardZoneToKeyMapping | null }>()
+const emit = defineEmits<ModalComponentEmits<MobileKeyboardZoneToKeyMapping>>()
 
 const { t } = useI18n()
 import UIKeyBtn from './ui/UIKeyBtn.vue';
@@ -132,17 +132,17 @@ const pool = ref<string[]>([
     ' ', '<', 'v', '^', '>'
 ])
 const zones = ['lt', 'rt', 'lbUp', 'lbLeft', 'lbRight', 'lbDown', 'rbA', 'rbB', 'rbX', 'rbY']
-type ZoneId = typeof zones[number]
-// const zoneToKey = reactive<Record<ZoneId, string | null>>({
+type MobileKeyboardZone = typeof zones[number]
+// const zoneToKey = reactive<Record<MobileKeyboardZone, string | null>>({
 //     lt: null, rt: null, lbUp: null, lbLeft: null, lbRight: null, lbDown: null, rbA: null, rbB: null, rbX: null, rbY: null
 // })
-const zoneToKey = reactive<KeyboardLayoutConfig>(props.initial ?? {})
+const zoneToKey = reactive<MobileKeyboardZoneToKeyMapping>(props.zoneToKeyMapping ?? {})
 
-const zoneRefs = Object.fromEntries(zones.map(id => [id, ref<HTMLElement | null>(null)])) as Record<ZoneId, ReturnType<typeof ref<HTMLElement | null>>>;
+const zoneRefs = Object.fromEntries(zones.map(id => [id, ref<HTMLElement | null>(null)])) as Record<MobileKeyboardZone, ReturnType<typeof ref<HTMLElement | null>>>;
 const paletteRef = ref<HTMLElement | null>(null)
-const drag = ref<{ value: string, x: number, y: number, source: 'pool' | ZoneId } | null>(null)
-const hoverZone = ref<ZoneId | null>(null)
-function startDrag(source: 'pool' | ZoneId, value: string, e: PointerEvent) {
+const drag = ref<{ value: string, x: number, y: number, source: 'pool' | MobileKeyboardZone } | null>(null)
+const hoverZone = ref<MobileKeyboardZone | null>(null)
+function startDrag(source: 'pool' | MobileKeyboardZone, value: string, e: PointerEvent) {
     // 如果从区域开始拖拽，先清空该区域，等待投放
     if (source !== 'pool') {
         zoneToKey[source] = null
@@ -193,7 +193,7 @@ function hit(el: HTMLElement | null, x: number, y: number) {
     return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom
 }
 
-// function confirm() { emit('resolved', draft.value) }
+
 function confirm() { emit('resolved', zoneToKey) }
 </script>
 <style lang="scss" scoped>

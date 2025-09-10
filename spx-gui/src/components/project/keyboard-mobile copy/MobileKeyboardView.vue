@@ -10,22 +10,7 @@ const zoneToKey = reactive<Record<ZoneId, string | null>>({
     lt: null, rt: null, lbUp: null, lbLeft: null, lbRight: null, lbDown: null, rbA: null, rbB: null, rbX: null, rbY: null
 })
 type BackendPayload = Partial<Record<ZoneId, string | null>>
-// onMounted(() => {
-//     const payload: BackendPayload = {
-//         lt: 'Q',
-//         rt: 'E',
-//         lbUp: '^',
-//         lbLeft: '<',
-//         lbRight: '>',
-//         lbDown: 'v',
-//         rbA: 'J',
-//         rbB: 'K',
-//         rbX: 'U',
-//         rbY: 'I'
-//     }
-//     Object.assign(zoneToKey, payload)
 
-// })
 type SystemKeyType = {
     textEn?: string,
     textZh?: string,
@@ -46,13 +31,13 @@ const systemKeys: SystemKeyType[] = [
         action: 'close',
     }
 ]
-const props = defineProps<{ initial?: BackendPayload | null }>()
+const props = defineProps<{ zoneToKeyMapping?: BackendPayload | null }>()
 const emit = defineEmits<{
     close: [],
     rerun: []
 }>()
 onMounted(() => {
-    Object.assign(zoneToKey, props.initial)
+    Object.assign(zoneToKey, props.zoneToKeyMapping)
 })
 </script>
 
@@ -60,18 +45,8 @@ onMounted(() => {
     <div class="phone-1YZxt">
         <slot name="gameView" class="game-view"></slot>
         <div class="stage-vTZqo">
-            <!-- <div class="sys sysA">
-                <slot name="sysA"></slot>
-            </div>
-            <div class="sys sysB">
-                <slot name="sysB"></slot>
-            </div> -->
+
             <div class="sys sysA">
-                <!-- <UIButton 
-                    class="button" icon="rotate" :disabled="initialLoading" :loading="handleRerun.isLoading.value"
-                    @click="emit('handleSysA')">
-                    {{ $t({ en: 'Rerun', zh: '重新运行' }) }}
-                </UIButton> -->
                 <UIButton class="button" :icon="systemKeys?.[0]?.icon" @click="emit('rerun')">
                     {{ $t({ en: systemKeys?.[0]?.textEn ?? '', zh: systemKeys?.[0]?.textZh ?? '' }) }}
                 </UIButton>

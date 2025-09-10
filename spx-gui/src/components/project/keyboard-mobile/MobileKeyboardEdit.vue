@@ -11,64 +11,10 @@
                     <div class="phone-1YZxt">
                         <img :src="phone" alt="phone" style="transform: rotate(180deg)" />
                         <div class="stage-vTZqo" :class="{ dragging: !!drag }">
-
-                            <!-- 左上角 1 个 -->
-                            <div class="zone lt" :ref="el => (zoneRefs.lt.value = el as HTMLElement)"
-                                :class="{ over: hoverZone === 'lt' }">
-                                <UIKeyBtn v-if="zoneToKey.lt" :value="zoneToKey.lt!"
-                                    @pointerdown.stop="startDrag('lt', zoneToKey.lt!, $event as PointerEvent)" />
+                            <div class="zone zoneA">
                             </div>
-                            <!-- 右上角 1 个 -->
-                            <div class="zone rt" :ref="el => (zoneRefs.rt.value = el as HTMLElement)"
-                                :class="{ over: hoverZone === 'rt' }">
-                                <UIKeyBtn v-if="zoneToKey.rt" :value="zoneToKey.rt!"
-                                    @pointerdown.stop="startDrag('rt', zoneToKey.rt!, $event as PointerEvent)" />
+                            <div class="zone zoneB">
                             </div>
-
-                            <!-- 左下角 4 个：每个独立 zone -->
-                            <div class="zone lb-up" :ref="el => (zoneRefs.lbUp.value = el as HTMLElement)"
-                                :class="{ over: hoverZone === 'lbUp' }">
-                                <UIKeyBtn v-if="zoneToKey.lbUp" :value="zoneToKey.lbUp!"
-                                    @pointerdown.stop="startDrag('lbUp', zoneToKey.lbUp!, $event as PointerEvent)" />
-                            </div>
-                            <div class="zone lb-left" :ref="el => (zoneRefs.lbLeft.value = el as HTMLElement)"
-                                :class="{ over: hoverZone === 'lbLeft' }">
-                                <UIKeyBtn v-if="zoneToKey.lbLeft" :value="zoneToKey.lbLeft!"
-                                    @pointerdown.stop="startDrag('lbLeft', zoneToKey.lbLeft!, $event as PointerEvent)" />
-                            </div>
-                            <div class="zone lb-right" :ref="el => (zoneRefs.lbRight.value = el as HTMLElement)"
-                                :class="{ over: hoverZone === 'lbRight' }">
-                                <UIKeyBtn v-if="zoneToKey.lbRight" :value="zoneToKey.lbRight!"
-                                    @pointerdown.stop="startDrag('lbRight', zoneToKey.lbRight!, $event as PointerEvent)" />
-                            </div>
-                            <div class="zone lb-down" :ref="el => (zoneRefs.lbDown.value = el as HTMLElement)"
-                                :class="{ over: hoverZone === 'lbDown' }">
-                                <UIKeyBtn v-if="zoneToKey.lbDown" :value="zoneToKey.lbDown!"
-                                    @pointerdown.stop="startDrag('lbDown', zoneToKey.lbDown!, $event as PointerEvent)" />
-                            </div>
-
-                            <!-- 右下角 4 个：每个独立 zone -->
-                            <div class="zone rb-a" :ref="el => (zoneRefs.rbA.value = el as HTMLElement)"
-                                :class="{ over: hoverZone === 'rbA' }">
-                                <UIKeyBtn v-if="zoneToKey.rbA" :value="zoneToKey.rbA!"
-                                    @pointerdown.stop="startDrag('rbA', zoneToKey.rbA!, $event as PointerEvent)" />
-                            </div>
-                            <div class="zone rb-b" :ref="el => (zoneRefs.rbB.value = el as HTMLElement)"
-                                :class="{ over: hoverZone === 'rbB' }">
-                                <UIKeyBtn v-if="zoneToKey.rbB" :value="zoneToKey.rbB!"
-                                    @pointerdown.stop="startDrag('rbB', zoneToKey.rbB!, $event as PointerEvent)" />
-                            </div>
-                            <div class="zone rb-x" :ref="el => (zoneRefs.rbX.value = el as HTMLElement)"
-                                :class="{ over: hoverZone === 'rbX' }">
-                                <UIKeyBtn v-if="zoneToKey.rbX" :value="zoneToKey.rbX!"
-                                    @pointerdown.stop="startDrag('rbX', zoneToKey.rbX!, $event as PointerEvent)" />
-                            </div>
-                            <div class="zone rb-y" :ref="el => (zoneRefs.rbY.value = el as HTMLElement)"
-                                :class="{ over: hoverZone === 'rbY' }">
-                                <UIKeyBtn v-if="zoneToKey.rbY" :value="zoneToKey.rbY!"
-                                    @pointerdown.stop="startDrag('rbY', zoneToKey.rbY!, $event as PointerEvent)" />
-                            </div>
-
                             <!-- 拖拽中的浮层（跟随指针） -->
                             <div v-if="drag" class="floating"
                                 :style="{ transform: `translate(${drag.x - 25}px, ${drag.y - 25}px)` }">
@@ -108,7 +54,6 @@ const emit = defineEmits<ModalComponentEmits<KeyboardLayoutConfig>>()
 
 const { t } = useI18n()
 import UIKeyBtn from './ui/UIKeyBtn.vue';
-import { UIModalClose } from '@/components/ui'
 import phone from '@/assets/images/mobile.png';
 import { reactive, ref } from 'vue'
 const pool = ref<string[]>([
@@ -240,8 +185,9 @@ function confirm() { emit('resolved', zoneToKey) }
     inset: 0;
     z-index: 2;
 
-    /* 区域占位（按你的图片比例微调百分比即可） */
     .zone {
+        width: 20%;
+        height: 85%;
         position: absolute;
         display: grid;
         place-items: center;
@@ -249,96 +195,14 @@ function confirm() { emit('resolved', zoneToKey) }
         transition: box-shadow .15s, border-color .15s;
     }
 
-    .sysA {
+    .zoneA {
         left: 5%;
-        top: 5%;
-
+        bottom: 0%;
     }
 
-    .sysB {
+    .zoneB {
         right: 5%;
-        top: 5%;
-
-    }
-
-    &.dragging .zone {
-        border-color: var(--color-primary);
-    }
-
-    .zone.over {
-        box-shadow: 0 0 0 2px rgba(100, 108, 255, .3) inset;
-    }
-
-    .lt {
-        left: 6%;
-        top: 20%;
-        width: 10%;
-        height: 14%;
-    }
-
-    .rt {
-        right: 6%;
-        top: 20%;
-        width: 10%;
-        height: 14%;
-    }
-
-    /* 左下四个：独立小区域（放在原 lb 范围内：left:6%; bottom:20%; width:28%; height:28%）*/
-    .lb-up {
-        left: 20%;
-        bottom: 40%;
-        width: 10%;
-        height: 14%;
-    }
-
-    .lb-left {
-        left: 10%;
-        bottom: 24%;
-        width: 10%;
-        height: 14%;
-    }
-
-    .lb-right {
-        left: 30%;
-        bottom: 24%;
-        width: 10%;
-        height: 14%;
-    }
-
-    .lb-down {
-        left: 20%;
-        bottom: 8%;
-        width: 10%;
-        height: 14%;
-    }
-
-    /* 右下四个：独立小区域（放在原 rb 范围内：right:6%; bottom:20%; width:20%; height:20%）*/
-    .rb-a {
-        right: 20%;
-        bottom: 30%;
-        width: 10%;
-        height: 14%;
-    }
-
-    .rb-b {
-        right: 5%;
-        bottom: 30%;
-        width: 10%;
-        height: 14%;
-    }
-
-    .rb-x {
-        right: 20%;
-        bottom: 10%;
-        width: 10%;
-        height: 14%;
-    }
-
-    .rb-y {
-        right: 5%;
-        bottom: 10%;
-        width: 10%;
-        height: 14%;
+        bottom: 0%;
     }
 
     .floating {

@@ -14,10 +14,6 @@ function toKeyAndCode(v: string) {
     'v': { key: 'ArrowDown', code: 'ArrowDown' },
     '^': { key: 'ArrowUp', code: 'ArrowUp' },
     '>': { key: 'ArrowRight', code: 'ArrowRight' },
-    // ArrowUp: { key: 'ArrowUp', code: 'ArrowUp' },
-    // ArrowDown: { key: 'ArrowDown', code: 'ArrowDown' },
-    // ArrowLeft: { key: 'ArrowLeft', code: 'ArrowLeft' },
-    // ArrowRight: { key: 'ArrowRight', code: 'ArrowRight' }
   }
   if (special[v] != null) return special[v]
 
