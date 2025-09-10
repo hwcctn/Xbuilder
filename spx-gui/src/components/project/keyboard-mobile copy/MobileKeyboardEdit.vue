@@ -11,7 +11,19 @@
                     <div class="phone-1YZxt">
                         <img :src="phone" alt="phone" style="transform: rotate(180deg)" />
                         <div class="stage-vTZqo" :class="{ dragging: !!drag }">
+                            <!-- 系统键 2 个 -->
+                            <div class="zone sysA">
+                                <UIButton
+                                    v-radar="{ name: 'Rerun button', desc: 'Click to rerun the project in full screen' }"
+                                    icon="rotate">
+                                    {{ $t({ en: 'Rerun', zh: '重新运行' }) }}
+                                </UIButton>
 
+                            </div>
+                            <div class="zone sysB">
+                                <UIModalClose
+                                    v-radar="{ name: 'Close full screen', desc: 'Click to close full screen project runner' }" />
+                            </div>
                             <!-- 左上角 1 个 -->
                             <div class="zone lt" :ref="el => (zoneRefs.lt.value = el as HTMLElement)"
                                 :class="{ over: hoverZone === 'lt' }">
@@ -90,6 +102,7 @@
             </div>
 
             <div class="footer">
+
                 <UIButton type="primary" @click="confirm">{{ t({ en: 'Confirm', zh: '确定' }) }}</UIButton>
             </div>
         </div>

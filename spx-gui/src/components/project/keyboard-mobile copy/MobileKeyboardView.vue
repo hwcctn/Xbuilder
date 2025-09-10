@@ -10,7 +10,22 @@ const zoneToKey = reactive<Record<ZoneId, string | null>>({
     lt: null, rt: null, lbUp: null, lbLeft: null, lbRight: null, lbDown: null, rbA: null, rbB: null, rbX: null, rbY: null
 })
 type BackendPayload = Partial<Record<ZoneId, string | null>>
+// onMounted(() => {
+//     const payload: BackendPayload = {
+//         lt: 'Q',
+//         rt: 'E',
+//         lbUp: '^',
+//         lbLeft: '<',
+//         lbRight: '>',
+//         lbDown: 'v',
+//         rbA: 'J',
+//         rbB: 'K',
+//         rbX: 'U',
+//         rbY: 'I'
+//     }
+//     Object.assign(zoneToKey, payload)
 
+// })
 type SystemKeyType = {
     textEn?: string,
     textZh?: string,
