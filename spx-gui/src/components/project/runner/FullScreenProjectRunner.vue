@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, shallowRef, computed, watch, type CSSProperties } from 'vue'
+import { ref, shallowRef, watch, type CSSProperties } from 'vue'
 import { timeout, untilNotNull } from '@/utils/utils'
 import { useMessageHandle } from '@/utils/exception'
 import { Project } from '@/models/project'
@@ -7,7 +7,7 @@ import { UIButton, UIModalClose, useResponsive } from '@/components/ui'
 import ProjectRunner from '@/components/project/runner/ProjectRunner.vue'
 import { useLastClickEvent } from '@/utils/dom'
 import MobileKeyboardView from '../keyboard-mobile/MobileKeyboardView.vue'
-import type { Type as IconType } from '@/components/ui/icons/UIIcon.vue'
+
 const props = defineProps<{
   project: Project
   visible: boolean
@@ -58,40 +58,8 @@ const handleRerun = useMessageHandle(() => projectRunnerRef.value?.rerun(), {
   zh: '重新运行项目失败'
 })
 const isMobile = useResponsive('mobile')
-const systemKeys = computed(() => [
-  {
-    textEn: 'Rerun',
-    textZh: '重新运行',
-    icon: 'rotate' as IconType,
-    loading: handleRerun.isLoading.value,
-    disabled: initialLoading.value,
-    action: 'rerun',
-  },
-  {
-    textEn: 'Close',
-    textZh: '关闭',
-    icon: 'close' as IconType,
-    loading: false,
-    disabled: false,
-    action: 'close',
-  }
-])
-// const systemKeys = [
-//   {
-//     textEn: 'Rerun',
-//     textZh: '重新运行',
-//     icon: 'rotate' as IconType,
-//     loading: handleRerun.isLoading.value,
-//     disabled: initialLoading.value,
-//   },
-// ]
-function handleSysBtn(action: string) {
-  if (action === 'rerun') {
-    handleRerun.fn()
-  } else if (action === 'close') {
-    emit('close')
-  }
-}
+
+
 </script>
 
 <template>
@@ -121,7 +89,7 @@ function handleSysBtn(action: string) {
       </div>
       <div class="main">
         <MobileKeyboardView v-if="isMobile && project.mobileKeyboardType === 2"
-          :initial="project.mobileKeyboardZoneToKey || {}" :SystemKeyConfig="systemKeys" @handleSysBtn="handleSysBtn">
+          :initial="project.mobileKeyboardZoneToKey || {}" @rerun="handleRerun.fn" @close="emit('close')">
           <template #gameView>
             <ProjectRunner ref="projectRunnerRef" class="runner" :project="project" />
           </template>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import UIKeyBtn from './ui/UIKeyBtn.vue';
-import { UIButton, UIModalClose } from '@/components/ui';
+import { UIButton } from '@/components/ui';
 import { onMounted, reactive } from 'vue';
 import type { Type as IconType } from '@/components/ui/icons/UIIcon.vue'
-import type { ac } from 'vitest/dist/reporters-P7C2ytIv.js';
+
 const zones = ['lt', 'rt', 'lbUp', 'lbLeft', 'lbRight', 'lbDown', 'rbA', 'rbB', 'rbX', 'rbY']
 type ZoneId = typeof zones[number]
 const zoneToKey = reactive<Record<ZoneId, string | null>>({
@@ -30,13 +30,26 @@ type SystemKeyType = {
     textEn?: string,
     textZh?: string,
     icon?: IconType,
-    loading?: boolean,
-    disabled?: boolean,
     action: string
 }
-const props = defineProps<{ initial?: BackendPayload | null, SystemKeyConfig?: SystemKeyType[] }>()
+const systemKeys: SystemKeyType[] = [
+    {
+        textEn: 'Rerun',
+        textZh: '重新运行',
+        icon: 'rotate' as IconType,
+        action: 'rerun',
+    },
+    {
+        textEn: 'Close',
+        textZh: '关闭',
+        icon: 'close' as IconType,
+        action: 'close',
+    }
+]
+const props = defineProps<{ initial?: BackendPayload | null }>()
 const emit = defineEmits<{
-    handleSysBtn: [action: string],
+    close: [],
+    rerun: []
 }>()
 onMounted(() => {
     Object.assign(zoneToKey, props.initial)
@@ -53,23 +66,19 @@ onMounted(() => {
             <div class="sys sysB">
                 <slot name="sysB"></slot>
             </div> -->
-            <div class="sys sysA" v-if="SystemKeyConfig?.[0]">
+            <div class="sys sysA">
                 <!-- <UIButton 
                     class="button" icon="rotate" :disabled="initialLoading" :loading="handleRerun.isLoading.value"
                     @click="emit('handleSysA')">
                     {{ $t({ en: 'Rerun', zh: '重新运行' }) }}
                 </UIButton> -->
-                <UIButton class="button" :icon="SystemKeyConfig?.[0]?.icon" :disabled="SystemKeyConfig?.[0]?.disabled"
-                    :loading="SystemKeyConfig?.[0]?.loading"
-                    @click="emit('handleSysBtn', SystemKeyConfig?.[0]?.action)">
-                    {{ $t({ en: SystemKeyConfig?.[0]?.textEn ?? '', zh: SystemKeyConfig?.[0]?.textZh ?? '' }) }}
+                <UIButton class="button" :icon="systemKeys?.[0]?.icon" @click="emit('rerun')">
+                    {{ $t({ en: systemKeys?.[0]?.textEn ?? '', zh: systemKeys?.[0]?.textZh ?? '' }) }}
                 </UIButton>
             </div>
-            <div class="sys sysB" v-if="SystemKeyConfig?.[1]">
-                <UIButton class="button" :icon="SystemKeyConfig?.[1]?.icon" :disabled="SystemKeyConfig?.[1]?.disabled"
-                    :loading="SystemKeyConfig?.[1]?.loading"
-                    @click="emit('handleSysBtn', SystemKeyConfig?.[1]?.action)">
-                    {{ $t({ en: SystemKeyConfig?.[1]?.textEn ?? '', zh: SystemKeyConfig?.[1]?.textZh ?? '' }) }}
+            <div class="sys sysB">
+                <UIButton class="button" :icon="systemKeys?.[1]?.icon" @click="emit('close')">
+                    {{ $t({ en: systemKeys?.[1]?.textEn ?? '', zh: systemKeys?.[1]?.textZh ?? '' }) }}
                 </UIButton>
             </div>
 
