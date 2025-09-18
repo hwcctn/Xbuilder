@@ -283,7 +283,7 @@ const specialKeys: KeyDefinition[] = [
 ]
 
 export const keys = [...alphabetKeys, ...numberKeys, ...functionKeys, ...arrowKeys, ...specialKeys]
-
+export const webKeys = keys.map((key) => key.webKeyValue)
 /** Map from name (in spx) to key definition */
 export const nameKeyMap = keys.reduce((map, key) => {
   map.set(key.name, key)
