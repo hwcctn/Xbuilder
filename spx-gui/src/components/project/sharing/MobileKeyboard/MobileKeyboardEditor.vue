@@ -161,7 +161,7 @@ const zones = ['lt', 'rt', 'lbUp', 'lbLeft', 'lbRight', 'lbDown', 'rbA', 'rbB', 
 type MobileKeyboardZone = (typeof zones)[number]
 
 const zoneToKey = reactive<MobileKeyboardZoneToKeyMapping>(props.zoneToKeyMapping ?? {})
-// Track from which pool a zone's current key originally came
+
 const zoneOriginPool = reactive<Record<MobileKeyboardZone, 'autoPool' | 'allPool' | undefined>>({})
 
 const zoneRefs = Object.fromEntries(zones.map((id) => [id, ref<HTMLElement | null>(null)])) as Record<
@@ -178,7 +178,7 @@ const drag = ref<{
 } | null>(null)
 const hoverZone = ref<MobileKeyboardZone | null>(null)
 function startDrag(source: 'autoPool' | 'allPool' | MobileKeyboardZone, value: string, e: PointerEvent) {
-  // Determine origin for this drag
+
   let originPool: 'autoPool' | 'allPool' | undefined
   if (source === 'autoPool' || source === 'allPool') originPool = source
   else originPool = zoneOriginPool[source]
@@ -295,7 +295,6 @@ onUnmounted(() => {
     flex-direction: row;
     align-items: stretch;
     justify-content: center;
-    /* make columns equal height */
     gap: 50px;
   }
 }

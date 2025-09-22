@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { KeyboardEventType, KeyCode } from '@/components/project/sharing/MobileKeyboard/mobile-keyboard'
+import type { KeyboardEventType, KeyCode } from '@/components/project/sharing/MobileKeyboard/mobile-keyboard'
 defineOptions({ name: 'UIKeyBtn' })
 const props = withDefaults(
   defineProps<{
@@ -13,49 +13,52 @@ const props = withDefaults(
 const emit = defineEmits<{
   key: [type: KeyboardEventType, key: KeyCode]
 }>()
+
+// 按键显示映射 - 将长按键名映射为短字符显示
+const keyDisplayMap: Record<string, string> = {
+  // 箭头键
+  'ArrowUp': '↑',
+  'ArrowDown': '↓',
+  'ArrowLeft': '←',
+  'ArrowRight': '→',
+
+  // 特殊功能键
+  ' ': ' ', // Space
+  'Enter': '↵',
+  'Backspace': '⌫',
+  'Tab': 'Tab',
+  'Shift': '⇧',
+  'Control': 'Ctrl',
+  'Alt': 'Alt',
+  'Escape': 'Esc'
+}
+
+// 获取按键的显示文本
+function getKeyDisplayText(keyValue: string): string {
+  return keyDisplayMap[keyValue] || keyValue
+}
+
 let isPressed = false
 function press(down: boolean) {
-  function toKeyAndCode(v: string): KeyCode {
-    // preprocessing - convert string to KeyCode enum
-    const special: Record<string, KeyCode> = {
-      '<': KeyCode.ARROW_LEFT,
-      v: KeyCode.ARROW_DOWN,
-      '^': KeyCode.ARROW_UP,
-      '>': KeyCode.ARROW_RIGHT
-    }
-    if (special[v] != null) return special[v]
 
-    if (/^[A-Za-z]$/.test(v)) {
-      const u = v.toUpperCase()
-      return u as KeyCode
-    }
-    return v as KeyCode
-  }
   function dispatchKey(type: KeyboardEventType, v: string) {
-    const keyCode = toKeyAndCode(v)
-    emit('key', type, keyCode)
+    emit('key', type, v)
   }
   if (down && !isPressed) {
     isPressed = true
-    dispatchKey(KeyboardEventType.KEY_DOWN, props.value)
+    dispatchKey('keydown', props.value)
   } else if (!down && isPressed) {
     isPressed = false
-    dispatchKey(KeyboardEventType.KEY_UP, props.value)
+    dispatchKey('keyup', props.value)
   }
 }
 </script>
 
 <template>
-  <div v-if="!props.active" class="ui-key-btn">{{ props.value }}</div>
-  <div
-    v-else
-    class="ui-key-btn"
-    @pointerdown.prevent.stop="press(true)"
-    @pointerup.prevent.stop="press(false)"
-    @pointercancel.prevent.stop="press(false)"
-    @pointerleave.prevent.stop="press(false)"
-  >
-    {{ props.value }}
+  <div v-if="!props.active" class="ui-key-btn">{{ getKeyDisplayText(props.value) }}</div>
+  <div v-else class="ui-key-btn" @pointerdown.prevent.stop="press(true)" @pointerup.prevent.stop="press(false)"
+    @pointercancel.prevent.stop="press(false)" @pointerleave.prevent.stop="press(false)">
+    {{ getKeyDisplayText(props.value) }}
   </div>
 </template>
 
