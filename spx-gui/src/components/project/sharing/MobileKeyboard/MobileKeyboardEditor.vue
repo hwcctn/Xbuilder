@@ -9,7 +9,7 @@
         <div class="editor-row">
           <div class="key-pool-side">
             <div class="pool-header">{{ t({ en: 'Recognized Keys', zh: '识别的按键' }) }}</div>
-            <div ref="paletteRef" class="palette">
+            <div ref="paletteAutoRef" class="palette">
               <div v-for="k in autoPool" :key="`P-${k}`" class="palette-item"
                 @pointerdown="startDragPool('autoPool', k, $event as PointerEvent)">
                 <UIKeyBtn :value="k" />
@@ -36,16 +36,17 @@
                 <div v-for="z in zones" :key="z" class="zone" :class="z"
                   :ref="(el) => (zoneRefs[z].value = el as HTMLElement)">
                   <div v-for="(k, i) in zoneTokeys[z]" :key="k.keyValue + '-' + i" class="key"
+                    :class="{ dragging: drag?.kind === 'key' && drag.zone === z && drag.index === i }"
                     :style="{ left: k.x + '%', top: k.y + '%', touchAction: 'none' }"
                     @pointerdown.stop="startDragKey(z, i, $event)">
-                    <UIKeyBtn :value="k.keyValue" :active="true" />
+                    <UIKeyBtn :value="k.keyValue" :active="false" />
                   </div>
                 </div>
 
                 <!-- 拖拽中的浮层（跟随指针） -->
                 <div v-if="drag" class="floating"
                   :style="{ transform: `translate(${drag.x - 25}px, ${drag.y - 25}px)` }">
-                  <UIKeyBtn :value="drag.keyValue" />
+                  <UIKeyBtn :value="drag.keyValue" :active="false" />
                 </div>
               </div>
             </div>
@@ -64,7 +65,7 @@
             </n-switch>
             <n-collapse-transition :show="show">
               <div class="pool-header"></div>
-              <div ref="paletteRef" class="palette">
+              <div ref="paletteAllRef" class="palette">
                 <div v-for="k in allPool" :key="`P-${k}`" class="palette-item"
                   @pointerdown="startDragPool('allPool', k, $event as PointerEvent)">
                   <UIKeyBtn :value="k" />
@@ -133,10 +134,20 @@ const zoneRefs = Object.fromEntries(zones.map((id) => [id, ref<HTMLElement | nul
   ZoneId,
   ReturnType<typeof ref<HTMLElement | null>>
 >
-const paletteRef = ref<HTMLElement | null>(null)
+const paletteAutoRef = ref<HTMLElement | null>(null)
+const paletteAllRef = ref<HTMLElement | null>(null)
 type DragState =
   | { kind: 'pool'; from: 'autoPool' | 'allPool'; keyValue: string; x: number; y: number }
-  | { kind: 'key'; zone: ZoneId; index: number; keyValue: string; x: number; y: number }
+  | {
+    kind: 'key'
+    zone: ZoneId
+    index: number
+    keyValue: string
+    x: number
+    y: number
+    prevX: number
+    prevY: number
+  }
 const drag = ref<DragState | null>(null)
 const hoverZone = ref<ZoneId | null>(null)
 
@@ -149,7 +160,16 @@ function startDragPool(from: 'autoPool' | 'allPool', keyValue: string, e: Pointe
 function startDragKey(zone: ZoneId, index: number, e: PointerEvent) {
   const k = zoneTokeys[zone][index]
   if (!k) return
-  drag.value = { kind: 'key', zone, index, keyValue: k.keyValue, x: e.clientX, y: e.clientY }
+  drag.value = {
+    kind: 'key',
+    zone,
+    index,
+    keyValue: k.keyValue,
+    x: e.clientX,
+    y: e.clientY,
+    prevX: k.x,
+    prevY: k.y
+  }
   window.addEventListener('pointermove', onMove)
   window.addEventListener('pointerup', onUp, { once: true })
 }
@@ -205,6 +225,23 @@ function onUp(e: PointerEvent) {
     const [px, py] = getPercentInZone(fromZone, e.clientX, e.clientY)
     const kp = zoneTokeys[fromZone][d.index]
     if (kp) { kp.x = px; kp.y = py }
+  } else {
+    // 未命中任何区域，若命中池则回池；否则回原位置
+    const overAuto = hit(paletteAutoRef.value, e.clientX, e.clientY)
+    const overAll = hit(paletteAllRef.value, e.clientX, e.clientY)
+    if (overAuto || overAll) {
+      const item = zoneTokeys[fromZone].splice(d.index, 1)[0]
+      if (item) {
+        if (overAuto) {
+          if (!autoPool.value.includes(item.keyValue)) autoPool.value.push(item.keyValue)
+        } else if (overAll) {
+          if (!allPool.value.includes(item.keyValue)) allPool.value.push(item.keyValue)
+        }
+      }
+    } else {
+      const kp = zoneTokeys[fromZone][d.index]
+      if (kp && d.kind === 'key') { kp.x = d.prevX; kp.y = d.prevY }
+    }
   }
   hoverZone.value = null
 }
@@ -332,6 +369,11 @@ onUnmounted(() => {
   .key {
     position: absolute;
     transform: translate(-50%, -50%);
+
+    &.dragging {
+      opacity: 0;
+      pointer-events: none;
+    }
   }
 
   .sysA {
