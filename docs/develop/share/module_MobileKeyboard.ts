@@ -1,6 +1,6 @@
 import { dispatchKeyToEvent } from "./module_ProjectAPIs";
 import type {
-  MobileKeyboardZoneToKeyMapping,
+  MobileKeyboardBtns,
   MobileKeyboardType,
 } from "./module_ProjectAPIs";
 import {
@@ -9,7 +9,7 @@ import {
 } from "../../../spx-gui/src/components/project/sharing/MobileKeyboard/mobile-keyboard";
 export type KeyboardConfig = {
   type: MobileKeyboardType;
-  mapping: MobileKeyboardZoneToKeyMapping;
+  btns: MobileKeyboardBtns;
 };
 export type UI = any;
 
@@ -19,11 +19,11 @@ export declare function useModal<T>(
 
 export declare function KeyboardEditorModal(
   props: {
-    zoneToKeyMapping: MobileKeyboardZoneToKeyMapping;
+    mobileKeyboardBtns: MobileKeyboardBtns;
     projectKeys: KeyCode[];
   },
   emits: {
-    resolved: (result: MobileKeyboardZoneToKeyMapping) => void;
+    resolved: (result: MobileKeyboardBtns) => void;
   }
 ): UI;
 
@@ -34,15 +34,15 @@ export declare function KeyboardEditorModal(
  * Now uses the globally exposed dispatchKeyToEvent method instead of requiring a ref.
  *
  * ## Props:
- * - `ZoneToKeyMapping`: keyboard zone to key mapping configuration
- *
+ * - `mobileKeyboardBtns`: Represents the mapping from each keyboard zone (lt, rt, lb, rb) to an array of KeyBtn objects contained in that zone.
+ * - `projectKeys`: project keys configuration
  * ## Slots:
  * - `gameView`: Should contain ProjectRunner component
  *
  * use:
  * ```vue
  * <MobileKeyboardView
- * :ZoneToKeyMapping="{ lt: 'Q', rt: 'E' }"
+ * :mobileKeyboardBtns="{ lt: [{label: 'Q', posx: 10, posy: 10}], rt: [{label: 'E', posx: 10, posy: 10}] }"
  * @close="emit('close')"
  * @rerun="emit('rerun')"
  * @key="handleOnKeyEvent">
@@ -55,7 +55,7 @@ export declare function KeyboardEditorModal(
 
 export declare function MobileKeyboardView(
   props: {
-    zoneToKeyMapping: MobileKeyboardZoneToKeyMapping;
+    mobileKeyboardBtns: MobileKeyboardBtns;
   },
   emits: {
     close: [];
@@ -64,18 +64,25 @@ export declare function MobileKeyboardView(
   }
 ): UI;
 //  {
-//   const zones = Object.keys(ZoneToKeyMapping);
-//   const zoneToKey = ZoneToKeyMapping;
+//   const zones = Object.keys(mobileKeyboardBtns);
 //   const handleOnKeyEvent = (type: KeyboardEventType, key: KeyCode) => {
 //     emit('key', type, key);
 //   }
 //   const keyButtons = zones
 //     .map(
 //       (zone) =>
-//         `<UIKeyBtn key="${zone}" value="${zoneToKey[zone]}" active={true} key=${handleOnKeyEvent} />`
-//     )
-//     .join("");
-
+//         `<div class="zone ${zone}">
+//            ${mobileKeyboardBtns[zone]
+//            .map(
+//              (btn) => `<div class="key-wrapper" style="left: ${btn.posx}px; top: ${btn.posy}px;">
+//               <UIKeyBtn
+//                 key="${btn.label}"
+//                 value="${btn.label}"
+//                 active={true}
+//                 onKey=${handleOnKeyEvent}
+//               />
+//            </div>`
+// )
 //   return `
 //     <div className="phone-layout">
 //       <slot name="gameView">

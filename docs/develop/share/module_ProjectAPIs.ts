@@ -5,29 +5,6 @@ import type {
 import { type ProjectRelease } from "../../../spx-gui/src/apis/project-release.ts";
 
 /**
- * Valid mobile keyboard zones
- */
-export const MOBILE_KEYBOARD_ZONES = [
-  "lt",
-  "rt",
-  "lbUp",
-  "lbLeft",
-  "lbRight",
-  "lbDown",
-  "rbA",
-  "rbB",
-  "rbX",
-  "rbY",
-] as const;
-
-export type MobileKeyboardZone = (typeof MOBILE_KEYBOARD_ZONES)[number];
-/**
- * Zone to key mapping for mobile keyboard
- */
-export type MobileKeyboardZoneToKeyMapping = {
-  [zone in MobileKeyboardZone]: string | null;
-};
-/**
  * Mobile keyboard type
  * - NoKeyboard: No keyboard
  * - CustomKeyboard: Custom keyboard
@@ -36,6 +13,29 @@ export enum MobileKeyboardType {
   NoKeyboard = 1,
   CustomKeyboard = 2,
 }
+export type KeyBtn{
+  /** The text displayed on the key. */
+  label:string;
+  /** The horizontal coordinate relative to one of the four corners of the screen (pixels). */
+  posx:number;
+  /** The vertical coordinate relative to one of the four corners of the screen (pixels). */
+  posy:number;
+}
+ /**  the four corners of the screen */
+export type zones="lt"|"rt"|"lb"|"rb"
+/**
+ * Represents all keys of a mobile keyboard, grouped by screen corners.
+ * Each property corresponds to one of the four corners of the screen:
+ *   - "lt": left top
+ *   - "rt": right top
+ *   - "lb": left bottom
+ *   - "rb": right bottom
+ * Each corner contains an array of KeyBtn objects representing the keys in that zone.
+ */
+export type MobileKeyboardBtns = {
+  [zone in zones]:KeyBtn[]
+}
+
 /**
  * Updated project data structure with mobile keyboard support
  */
@@ -77,7 +77,7 @@ export type ProjectData = {
   /** Mobile keyboard type */
   mobileKeyboardType: MobileKeyboardType;
   /** Zone to key mapping for mobile keyboard */
-  mobileKeyboardZoneToKey?: MobileKeyboardZoneToKeyMapping;
+  mobileKeyboardBtns?: MobileKeyboardBtns;
 };
 
 /**
@@ -95,7 +95,7 @@ export type AddProjectParams = {
   /** Mobile keyboard type */
   mobileKeyboardType: MobileKeyboardType;
   /** Zone to key mapping for mobile keyboard */
-  mobileKeyboardZoneToKey?: MobileKeyboardZoneToKeyMapping;
+  mobileKeyboardBtns?: MobileKeyboardBtns;
 };
 
 /**
@@ -111,7 +111,7 @@ export type AddProjectByRemixParams = {
   /** Mobile keyboard type */
   mobileKeyboardType: MobileKeyboardType;
   /** Zone to key mapping for mobile keyboard */
-  mobileKeyboardZoneToKey?: MobileKeyboardZoneToKeyMapping;
+  mobileKeyboardBtns?: MobileKeyboardBtns;
 };
 
 /**
@@ -131,7 +131,7 @@ export type UpdateProjectParams = {
   /** Mobile keyboard type */
   mobileKeyboardType?: MobileKeyboardType;
   /** Zone to key mapping for mobile keyboard */
-  mobileKeyboardZoneToKey?: MobileKeyboardZoneToKeyMapping;
+  mobileKeyboardBtns?: MobileKeyboardBtns;
 };
 
 /**

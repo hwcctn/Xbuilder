@@ -113,7 +113,7 @@ const allPool = ref<string[]>(webKeys.filter((k) => !props.projectKeys?.includes
 const autoPool = ref<string[]>(props.projectKeys ? props.projectKeys.filter((k) => !assignedKeys.has(k)) : [])
 const zones = ['lt', 'rt', 'lb', 'rb'] as const
 type ZoneId = (typeof zones)[number]
-type KeyPos = { keyValue: string, x: number, y: number }
+type KeyPos = { keyValue: string, x: number, y: number, origin?: 'autoPool' | 'allPool' }
 const zoneTokeys = reactive<Record<ZoneId, KeyPos[]>>({
   lt: [], rt: [], lb: [], rb: []
 })
@@ -145,8 +145,7 @@ type DragState =
     keyValue: string
     x: number
     y: number
-    prevX: number
-    prevY: number
+    originFrom: 'autoPool' | 'allPool'
   }
 const drag = ref<DragState | null>(null)
 const hoverZone = ref<ZoneId | null>(null)
@@ -167,8 +166,7 @@ function startDragKey(zone: ZoneId, index: number, e: PointerEvent) {
     keyValue: k.keyValue,
     x: e.clientX,
     y: e.clientY,
-    prevX: k.x,
-    prevY: k.y
+    originFrom: k.origin ?? (props.projectKeys?.includes(k.keyValue) ? 'autoPool' : 'allPool')
   }
   window.addEventListener('pointermove', onMove)
   window.addEventListener('pointerup', onUp, { once: true })
@@ -207,7 +205,7 @@ function onUp(e: PointerEvent) {
   if (d.kind === 'pool') {
     if (targetZone) {
       const [px, py] = getPercentInZone(targetZone, e.clientX, e.clientY)
-      zoneTokeys[targetZone].push({ keyValue: d.keyValue, x: px, y: py })
+      zoneTokeys[targetZone].push({ keyValue: d.keyValue, x: px, y: py, origin: d.from })
       if (d.from === 'autoPool') autoPool.value = autoPool.value.filter((v) => v !== d.keyValue)
       else allPool.value = allPool.value.filter((v) => v !== d.keyValue)
     }
@@ -220,27 +218,21 @@ function onUp(e: PointerEvent) {
   if (targetZone && targetZone !== fromZone) {
     const [px, py] = getPercentInZone(targetZone, e.clientX, e.clientY)
     const item = zoneTokeys[fromZone].splice(d.index, 1)[0]
-    if (item) zoneTokeys[targetZone].push({ keyValue: item.keyValue, x: px, y: py })
+    if (item) zoneTokeys[targetZone].push({ keyValue: item.keyValue, x: px, y: py, origin: item.origin ?? d.originFrom })
   } else if (targetZone === fromZone) {
     const [px, py] = getPercentInZone(fromZone, e.clientX, e.clientY)
     const kp = zoneTokeys[fromZone][d.index]
     if (kp) { kp.x = px; kp.y = py }
   } else {
-    // 未命中任何区域，若命中池则回池；否则回原位置
-    const overAuto = hit(paletteAutoRef.value, e.clientX, e.clientY)
-    const overAll = hit(paletteAllRef.value, e.clientX, e.clientY)
-    if (overAuto || overAll) {
-      const item = zoneTokeys[fromZone].splice(d.index, 1)[0]
-      if (item) {
-        if (overAuto) {
-          if (!autoPool.value.includes(item.keyValue)) autoPool.value.push(item.keyValue)
-        } else if (overAll) {
-          if (!allPool.value.includes(item.keyValue)) allPool.value.push(item.keyValue)
-        }
+    // 未命中区域：无论是否命中面板，都回到原始池子
+    const item = zoneTokeys[fromZone].splice(d.index, 1)[0]
+    if (item) {
+      const origin = item.origin ?? d.originFrom
+      if (origin === 'autoPool') {
+        if (!autoPool.value.includes(item.keyValue)) autoPool.value.push(item.keyValue)
+      } else {
+        if (!allPool.value.includes(item.keyValue)) allPool.value.push(item.keyValue)
       }
-    } else {
-      const kp = zoneTokeys[fromZone][d.index]
-      if (kp && d.kind === 'key') { kp.x = d.prevX; kp.y = d.prevY }
     }
   }
   hoverZone.value = null
@@ -339,7 +331,7 @@ onUnmounted(() => {
   .zone {
     position: absolute;
     width: 30%;
-    height: 49%;
+    height: 42%;
     border: 2px dashed #fff;
     transition:
       box-shadow 0.15s,
@@ -347,23 +339,23 @@ onUnmounted(() => {
   }
 
   .zone.lt {
-    left: 0;
-    top: 0;
+    left: 20px;
+    top: 20px;
   }
 
   .zone.rt {
-    right: 0;
-    top: 0;
+    right: 20px;
+    top: 20px;
   }
 
   .zone.lb {
-    left: 0;
-    bottom: 0;
+    left: 20px;
+    bottom: 20px;
   }
 
   .zone.rb {
-    right: 0;
-    bottom: 0;
+    right: 20px;
+    bottom: 20px;
   }
 
   .key {
